@@ -22,26 +22,6 @@ body {
     font-size: 0.9em;
 }
 
-#skip-initialization {
-    background-color: #2196f3;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    margin-bottom: 20px;
-}
-
-#skip-initialization:hover {
-    background-color: #0b7dda;
-}
-
-#skip-wait-message {
-    color: yellow;
-    margin-top: 10px;
-}
-
 .countdown-circle-container {
     width: 150px; /* Adjust size as needed */
     height: 150px; /* Adjust size as needed */
@@ -55,6 +35,7 @@ body {
 
 #countdown-timer {
     font-size: 3em;
+    /* Centered due to flex properties of the parent */
 }
 
 .copyright {
