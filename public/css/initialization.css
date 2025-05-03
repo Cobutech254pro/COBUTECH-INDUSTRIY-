@@ -2,6 +2,7 @@ body {
     background: linear-gradient(to bottom right, #f44336, #2196f3); /* Initial gradient */
     margin: 0;
     display: flex;
+    flex-direction: column; /* Arrange items vertically */
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -25,7 +26,9 @@ body {
 
 .container {
     text-align: center;
-    position: relative; /* For absolute positioning of elements within */
+    display: flex;
+    flex-direction: column; /* Arrange items vertically within the container */
+    align-items: center;
 }
 
 #datetime-top-right-init {
@@ -35,14 +38,17 @@ body {
     font-size: 0.9em;
 }
 
+.loading-container {
+    margin-bottom: 20px; /* Space between loading text and circle */
+}
+
 #loading-text {
     font-size: 1.5em;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 #please-wait-text {
     font-size: 1.2em;
-    margin-bottom: 15px;
 }
 
 .countdown-circle-container {
@@ -53,7 +59,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px; /* Space between circle and copyright */
 }
 
 #countdown-timer {
@@ -64,10 +70,6 @@ body {
 .copyright {
     font-size: 0.8em;
     color: #ccc;
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 .hidden {
