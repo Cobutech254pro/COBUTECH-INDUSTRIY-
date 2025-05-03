@@ -8,6 +8,7 @@ const loadingWords = "LOADING...";
 const typingSpeed = 150;
 let countdown = countdownDuration;
 let loadingIndex = 0;
+let loadingSequenceComplete = false;
 
 function updateDateTime(element) {
     const now = new Date();
@@ -24,27 +25,28 @@ function typeLoading() {
         // After "LOADING...", show "PLEASE WAIT..." after a short delay
         setTimeout(() => {
             pleaseWaitTextElement.classList.remove('hidden');
+            loadingSequenceComplete = true; // Indicate loading sequence is finished
+            startCountdown(); // Start the countdown after "PLEASE WAIT..." appears
         }, 500);
+    }
+}
+
+function startCountdown() {
+    countdownTimerElement.textContent = countdown;
+    if (countdown > 0) {
+        setTimeout(() => {
+            countdown--;
+            startCountdown();
+        }, 1000);
+    } else {
+        window.location.href = '/public/welcome-dashboard.html'; // Redirect
     }
 }
 
 function startInitialization() {
     updateDateTime(datetimeTopRightInit);
     setInterval(() => updateDateTime(datetimeTopRightInit), 1000);
-    updateCountdown();
     typeLoading(); // Start the typing animation for "LOADING..."
-}
-
-function updateCountdown() {
-    countdownTimerElement.textContent = countdown;
-    if (countdown > 0) {
-        setTimeout(() => {
-            countdown--;
-            updateCountdown();
-        }, 1000);
-    } else {
-        window.location.href = '/public/welcome-dashboard.html'; // Redirect
-    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
