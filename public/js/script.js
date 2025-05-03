@@ -36,7 +36,7 @@ function typeLine() {
                     }
                     // Redirect after the initial delay
                     setTimeout(() => {
-                        window.location.href = '/public/initialization.html';
+                        window.location.href = './initialization.html';
                     }, initialDelay);
                 }, fadeInDelay);
             }, 500);
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         // Fallback redirection if elements are not found
         setTimeout(() => {
-            window.location.href = '/public/initialization.html';
+            window.location.href = '/initialization.html';
         }, initialDelay);
     }
 });
