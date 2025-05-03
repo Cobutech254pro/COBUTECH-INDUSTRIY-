@@ -27,7 +27,7 @@ function typeLine() {
             setTimeout(() => {
                 bestTechTextElement.innerHTML = bestTechText.replace('\n', '<br>'); // Display tagline
                 setTimeout(() => {
-                    window.location.href = 'public/initialization.html'; // Redirect
+                    window.location.href = '/public/initialization.html'; // Redirect
                 }, initialDelay - (typingSpeed * cobuTechText.length + 500));
             }, 500);
         }
