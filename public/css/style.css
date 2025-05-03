@@ -1,42 +1,51 @@
+body {
+  background-color: red;
+  margin: 0;
+  padding: 0; /* Ensure no default padding */
+}
+
+html {
+  background-color: red; /* Ensure the root element also has a red background */
+}
 
 #initial-welcome-page {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-    position: relative;
-    background-color: #e53935; /* Reddish background */
-    color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+  position: relative;
+  background-color: transparent; /* Make the container transparent */
+  color: #fff;
 }
 
 #datetime-top-right-initial {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 0.9em;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.9em;
 }
 
 #welcome-animation {
-    /* Styles for the typing animation container */
+  /* Styles for the typing animation container */
 }
 
 #cobu-tech-typing {
-    font-size: 2.5em;
-    white-space: nowrap;
-    overflow: hidden;
-    border-right: .15em solid #fff;
-    animation: typing-initial 3s steps(17, end), blink-caret .75s step-end infinite;
-    margin-bottom: 10px;
+  font-size: 2.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: .15em solid #fff;
+  animation: typing-initial 3s steps(17, end), blink-caret .75s step-end infinite;
+  margin-bottom: 10px;
 }
 
 #best-tech-text {
-    font-size: 1.2em;
-    color: #fdd835;
+  font-size: 1.2em;
+  color: #fdd835;
 }
 
 @keyframes typing-initial {
-    from { width: 0 }
-    to { width: 100% }
+  from { width: 0 }
+  to { width: 100% }
 }
