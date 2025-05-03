@@ -1,7 +1,8 @@
+// Inside your public/js/script.js file
+
 const cobuTechTypingElement = document.getElementById('cobu-tech-typing');
 const bestTechTextElement = document.getElementById('best-tech-text');
 const datetimeTopRightInitial = document.getElementById('datetime-top-right-initial');
-const initialWelcomePage = document.getElementById('initial-welcome-page');
 
 const cobuTechText = "WELCOME TO"; // Updated typing text
 const bestTechText = "COBUTECH INDUSTRY\nTHE BEST TECH YOU'VE EVER SEEN..."; // Updated tagline
@@ -36,12 +37,23 @@ function typeLine() {
 
 function updateDateTime(element) {
     const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: numeric, hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
     element.textContent = now.toLocaleDateString('en-KE', options);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    updateDateTime(datetimeTopRightInitial);
-    setInterval(() => updateDateTime(datetimeTopRightInitial), 1000);
-    typeLine(); // Start the typing animation
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
+    if (datetimeTopRightInitial) {
+        datetimeTopRightInitial.textContent = now.toLocaleDateString('en-KE', options);
+        setInterval(() => updateDateTime(datetimeTopRightInitial), 1000);
+    }
+    if (cobuTechTypingElement && bestTechTextElement) {
+        typeLine(); // Start the typing animation
+    } else {
+        // If elements are not found, redirect after a short delay as a fallback
+        setTimeout(() => {
+            window.location.href = '/public/initialization.html';
+        }, initialDelay);
+    }
 });
