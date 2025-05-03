@@ -4,12 +4,9 @@ const loadingTextElement = document.getElementById('loading-text');
 const pleaseWaitTextElement = document.getElementById('please-wait-text');
 
 const countdownDuration = 60;
-const backgroundColorChangeInterval = 1000;
-const backgroundColors = ["#f44336", "#2196f3", "#4caf50", "#ff9800", "#9c27b0"];
 const loadingWords = "LOADING...";
 const typingSpeed = 150;
 let countdown = countdownDuration;
-let colorIndex = 0;
 let loadingIndex = 0;
 
 function updateDateTime(element) {
@@ -35,8 +32,6 @@ function startInitialization() {
     updateDateTime(datetimeTopRightInit);
     setInterval(() => updateDateTime(datetimeTopRightInit), 1000);
     updateCountdown();
-    changeBackgroundColor();
-    setInterval(changeBackgroundColor, backgroundColorChangeInterval);
     typeLoading(); // Start the typing animation for "LOADING..."
 }
 
@@ -50,11 +45,6 @@ function updateCountdown() {
     } else {
         window.location.href = '/public/welcome-dashboard.html'; // Redirect
     }
-}
-
-function changeBackgroundColor() {
-    document.body.style.backgroundColor = backgroundColors[colorIndex];
-    colorIndex = (colorIndex + 1) % backgroundColors.length;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
