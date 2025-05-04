@@ -1,3 +1,9 @@
+console.log('verification.js file has loaded!');
+
+// Your existing JavaScript code below this line
+
+
+
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
 
 // Firebase configuration (replace with your actual config)
