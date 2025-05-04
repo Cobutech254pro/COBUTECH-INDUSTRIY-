@@ -1,8 +1,8 @@
-// Import Firebase SDK (assuming you've included it in your HTML via CDN or build process)
+// Import Firebase SDK
 import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
-// Your web app's Firebase configuration (replace with your actual config)
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCmk6NU1uiCnb6syjOmgTjpq5qBP5QyQAY",
   authDomain: "cobu-tech-portal.firebaseapp.com",
@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
             signupEmail = document.getElementById('signup-email').value;
             signupName = document.getElementById('signup-name').value;
 
-            // Basic client-side validation for step 1
             if (signupEmail && signupName) {
                 step1.classList.remove('active');
                 step2.classList.add('active');
@@ -57,12 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (password === confirmPassword && terms) {
                 try {
-                    // 1. Create user with Firebase
                     const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, password);
                     const user = userCredential.user;
                     console.log('Firebase user created:', user);
 
-                    // 2. Send Firebase UID and name to your backend
                     const response = await fetch('/api/auth/signup', {
                         method: 'POST',
                         headers: {
@@ -75,12 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (response.ok) {
                         console.log('Backend registration successful:', data);
-                        // TODO: Handle successful registration (e.g., redirect user)
                         alert('Registration successful!');
-                        window.location.href = '/public/index.html'; // Redirect to welcome page for now
+                        window.location.href = '/public/index.html';
                     } else {
                         console.error('Backend registration failed:', data);
-                        // TODO: Display error message to the user
                         alert(`Registration failed: ${data.error || 'Something went wrong.'}`);
                     }
 
@@ -95,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         errorMessage = 'Password should be at least 6 characters.';
                     }
                     alert(errorMessage);
-                    // TODO: Display Firebase error message to the user
                 }
             } else {
                 if (password !== confirmPassword) {
@@ -109,9 +103,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (googleSigninButton) {
-        googleSigninButton.addEventListener('click', () => {
-            // TODO: Implement Google Sign-in functionality with Firebase
-            console.log('Signing up with Google');
+        googleSigninButton.addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                const token = credential?.accessToken;
+
+                console.log('Signed in with Google:', user);
+
+                const response = await fetch('/api/auth/signup', { // Or a dedicated endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ firebaseUid: user.uid, name: user.displayName, email: user.email, googleToken: token }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    console.log('Backend Google sign-in successful:', data);
+                    alert('Google sign-in successful!');
+                    window.location.href = '/public/index.html';
+                } else {
+                    console.error('Backend Google sign-in failed:', data);
+                    alert(`Google sign-in failed: ${data.error || 'Something went wrong.'}`);
+                }
+
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                alert(`Google sign-in error: ${error.message}`);
+            }
         });
     }
 });
