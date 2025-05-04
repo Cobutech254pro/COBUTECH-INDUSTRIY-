@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const admin = require('firebase-admin');
@@ -18,11 +19,21 @@ mongoose.connect(process.env.MONGODB_URI, {
 .catch(err => console.error('Could not connect to MongoDB:', err));
 
 // Initialize Firebase Admin SDK (Make sure you have the credentials set as an environment variable)
-const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIALS);
+let serviceAccount;
+try {
+  serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIALS);
+} catch (error) {
+  console.error('Error parsing FIREBASE_ADMIN_CREDENTIALS:', error);
+  // Handle the error appropriately, maybe exit the process if Firebase is essential
+}
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+if (serviceAccount) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+} else {
+  console.warn('Firebase Admin SDK not initialized due to missing or invalid credentials.');
+}
 
 // Use authentication routes
 app.use('/api/auth', authRoutes);
