@@ -1,4 +1,3 @@
-
 // server/models/userModel.js
 const mongoose = require('mongoose');
 
