@@ -1,7 +1,7 @@
-const User = require('../models/userModel');
+const User = require('../models/userModel.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const transporter = require('../config/emailConfig');
+const transporter = require('../config/emailConfig.js');
 
 const verificationCodes = {};
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
