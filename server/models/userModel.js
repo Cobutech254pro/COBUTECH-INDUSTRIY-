@@ -3,25 +3,33 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     firebaseUid: {
         type: String,
-        required: true,
         unique: true,
+        sparse: true // Allows null or undefined values, but unique if present
     },
     name: {
         type: String,
-        required: true,
+        required: true
     },
     email: {
         type: String,
         required: true,
         unique: true,
         lowercase: true,
-        trim: true,
+        trim: true
+    },
+    password: {
+        type: String
     },
     isEmailVerified: {
         type: Boolean,
-        default: false,
+        default: false
     },
-}, { timestamps: true }); // Adds createdAt and updatedAt fields automatically
+    accountStatus: {
+        type: String,
+        enum: ['pending', 'active', 'blocked'],
+        default: 'pending'
+    },
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 
