@@ -4,8 +4,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithPopup,
-  GoogleAuthProvider,
-  sendEmailVerification
+  GoogleAuthProvider
+  // sendEmailVerification REMOVED
 } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 
 // Firebase configuration
@@ -50,17 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
     step1.classList.add('active');
   });
 
-  async function handleSuccessfulSignup(user) {
-    try {
-      await sendEmailVerification(user);
-      console.log('Verification email sent.');
-      alert('Sign up successful! Please check your email to verify your account.');
-      window.location.href = '/public/verification.html'; // Redirect to verification page
-    } catch (error) {
-      console.error('Error sending verification email:', error);
-      alert('Sign up successful, but failed to send verification email. Please request it on the verification page.');
-      window.location.href = '/public/verification.html'; // Still redirect
-    }
+  async function handleSuccessfulSignup() { // Removed the 'user' parameter
+    console.log('Sign up successful!');
+    alert('Sign up successful! Please verify your account.');
+    window.location.href = '/public/verification.html'; // Redirect to verification page
   }
 
   signupButton?.addEventListener('click', async () => {
@@ -81,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, password);
       console.log('User created:', userCredential.user);
-      await handleSuccessfulSignup(userCredential.user); // Send verification email and redirect
+      await handleSuccessfulSignup(); // Call without the 'user' object
     } catch (error) {
       console.error('Sign up error:', error);
       alert(error.message);
@@ -107,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = await response.json();
       if (response.ok) {
-        await handleSuccessfulSignup(user); // Send verification email and redirect
+        await handleSuccessfulSignup(); // Call without the 'user' object
       } else {
         alert(`Google sign-in failed: ${data.error || 'Unknown error'}`);
       }
