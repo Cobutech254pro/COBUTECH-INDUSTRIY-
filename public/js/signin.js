@@ -1,26 +1,17 @@
-// Firebase imports (use CDN-compatible module imports)
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider
-} from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+import { initializeApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
-// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCmk6NU1uiCnb6syjOmgTjpq5qBP5QyQAY",
   authDomain: "cobu-tech-portal.firebaseapp.com",
   projectId: "cobu-tech-portal",
-  storageBucket: "cobu-tech-portal.firebasestorage.app",
+  storageBucket: "cobu-tech-portal.appspot.com",
   messagingSenderId: "61919067593",
   appId: "1:61919067593:web:5a60042df8622d6edb3c18"
 };
 
-// Init Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
   const step1 = document.getElementById('step1');
@@ -30,17 +21,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const signupButton = document.getElementById('signup-button');
   const googleSigninButton = document.querySelector('.google-signin-button');
 
-  let signupEmail, signupName;
-
   nextStepButton?.addEventListener('click', () => {
-    signupEmail = document.getElementById('signup-email')?.value;
-    signupName = document.getElementById('signup-name')?.value;
+    const email = document.getElementById('signup-email');
+    const name = document.getElementById('signup-name');
+    const emailError = document.getElementById('email-error');
+    const nameError = document.getElementById('name-error');
 
-    if (signupEmail && signupName) {
+    let valid = true;
+
+    if (!email.value.trim()) {
+      email.classList.add('error');
+      emailError.textContent = 'Please enter your email.';
+      valid = false;
+    } else {
+      email.classList.remove('error');
+      emailError.textContent = '';
+    }
+
+    if (!name.value.trim()) {
+      name.classList.add('error');
+      nameError.textContent = 'Please enter your name.';
+      valid = false;
+    } else {
+      name.classList.remove('error');
+      nameError.textContent = '';
+    }
+
+    if (valid) {
       step1.classList.remove('active');
       step2.classList.add('active');
-    } else {
-      alert('Please enter your email and name.');
     }
   });
 
@@ -50,55 +59,49 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   signupButton?.addEventListener('click', async () => {
-    const password = document.getElementById('signup-password')?.value;
-    const confirmPassword = document.getElementById('confirm-password')?.value;
-    const termsChecked = document.getElementById('terms')?.checked;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password');
+    const confirm = document.getElementById('confirm-password');
+    const passwordError = document.getElementById('password-error');
 
-    if (!password || !confirmPassword || password !== confirmPassword) {
-      alert('Passwords do not match.');
+    if (password.value !== confirm.value) {
+      password.classList.add('error');
+      confirm.classList.add('error');
+      passwordError.textContent = 'Passwords do not match.';
       return;
     }
 
-    if (!termsChecked) {
-      alert('Please agree to the terms.');
-      return;
-    }
+    password.classList.remove('error');
+    confirm.classList.remove('error');
+    passwordError.textContent = '';
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, password);
-      console.log('User created:', userCredential.user);
-      alert('Sign up successful!');
-      window.location.href = '/public/index.html';
-    } catch (error) {
-      console.error('Sign up error:', error);
-      alert(error.message);
+      await createUserWithEmailAndPassword(auth, email, password.value);
+      window.location.href = '/public/verify.html';
+    } catch (err) {
+      alert('Signup failed: ' + err.message);
     }
   });
 
   googleSigninButton?.addEventListener('click', async () => {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      const token = GoogleAuthProvider.credentialFromResult(result)?.accessToken;
 
-      const response = await fetch('/api/auth/signup', {
+      await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           firebaseUid: user.uid,
           name: user.displayName,
-          email: user.email,
-          googleToken: token
+          email: user.email
         }),
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert('Google sign-in successful!');
-        window.location.href = '/public/index.html';
-      } else {
-        alert(`Google sign-in failed: ${data.error || 'Unknown error'}`);
-      }
+      window.location.href = '/public/verify.html';
     } catch (error) {
       console.error('Google sign-in error:', error);
       alert(`Google sign-in error: ${error.message}`);
