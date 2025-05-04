@@ -1,4 +1,3 @@
-// server/controllers/authController.js
 const admin = require('firebase-admin');
 const mongoose = require('mongoose');
 const User = require('../models/userModel');
