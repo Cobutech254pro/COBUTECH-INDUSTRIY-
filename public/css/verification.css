@@ -96,3 +96,11 @@ h1 {
     font-weight: bold;
     color: #000; /* Ensure error message text is black */
 }
+/* ... existing CSS ... */
+
+.incorrect-code {
+    color: black !important; /* Force text to black */
+    background-color: #ffe0e0; /* Optional: Add a light red background */
+    border-color: red;
+}
+
