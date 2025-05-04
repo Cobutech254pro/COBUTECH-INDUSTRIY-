@@ -1,19 +1,21 @@
-const admin = require('firebase-admin');
+const admin = require('firebase-admin'); // You might not be using this directly for your current flow
 const mongoose = require('mongoose');
 const User = require('../models/userModel');
 const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt'); // For password hashing
-const jwt = require('jsonwebtoken'); // For creating authentication tokens
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
+// Configuration Variables
 const verificationCodes = {};
 const requestCooldown = {};
 const requestCounts = {};
-const COOLDOWN_DURATION = 120000; // 120 seconds
+const COOLDOWN_DURATION = 20000; // 20 seconds
 const CODE_EXPIRY_DURATION = 60000; // 60 seconds
 const MAX_REQUESTS = 3;
 const BLOCK_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // Replace with a strong, secure secret
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
+// Nodemailer Transporter Setup
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
@@ -22,11 +24,14 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Helper function to generate JWT token
+// Helper Function
 const generateToken = (userId) => {
-    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '1h' }); // Token expires in 1 hour
+    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '1h' });
 };
 
+// ----------------------- AUTHENTICATION CONTROLLERS -----------------------
+
+// 1. Signup (Registration)
 exports.signup = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -45,13 +50,14 @@ exports.signup = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            isEmailVerified: false
+            isEmailVerified: false,
+            accountStatus: 'pending' // Set initial account status to pending
         });
 
         await newUser.save();
 
         req.userEmail = email; // Store email for verification flow
-        return res.status(201).json({ message: 'Registration successful. Please verify your email.' });
+        return res.status(201).json({ message: 'Registration successful. Please verify your account.' });
 
     } catch (error) {
         console.error('Error during signup:', error);
@@ -63,6 +69,7 @@ exports.signup = async (req, res) => {
     }
 };
 
+// 2. Login (Signing In)
 exports.login = async (req, res) => {
     const { email, password } = req.body;
 
@@ -77,8 +84,13 @@ exports.login = async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials.' });
         }
 
+        if (user.accountStatus === 'pending') {
+            req.userEmail = email;
+            return res.status(403).json({ error: 'Account is pending verification. Please verify your email.' });
+        }
+
         if (!user.isEmailVerified) {
-            req.userEmail = email; // Store email for potential resend
+            req.userEmail = email;
             return res.status(403).json({ error: 'Email not verified. Please verify your email.' });
         }
 
@@ -91,39 +103,43 @@ exports.login = async (req, res) => {
     }
 };
 
+// ----------------------- EMAIL VERIFICATION CONTROLLERS -----------------------
+
+// 3. Send Verification Code
 exports.sendVerificationCode = async (req, res) => {
-    const userEmail = req.userEmail || req.body.email; // Get email from session or request
+    const userEmail = req.userEmail || req.body.email;
 
     if (!userEmail) {
         return res.status(400).json({ error: 'Email address not found.' });
     }
 
     try {
-        const user = await User.findOne({ email: userEmail });
+        const user = await User.findOne({ email: userEmail, accountStatus: 'pending' });
         if (!user) {
-            return res.status(404).json({ error: 'User not found.' });
+            return res.status(404).json({ error: 'User not found or account already verified.' });
         }
 
-        // Check if user is blocked
+        // Rate limiting for code requests
         if (requestCooldown[userEmail] && requestCooldown[userEmail].blockUntil > Date.now()) {
             const timeLeft = Math.ceil((requestCooldown[userEmail].blockUntil - Date.now()) / 1000);
             return res.status(429).json({ error: `Too many attempts. You can request again after ${timeLeft} seconds.` });
         }
 
-        // Initialize or increment request count
         requestCounts[userEmail] = (requestCounts[userEmail] || 0) + 1;
 
         if (requestCounts[userEmail] > MAX_REQUESTS) {
             requestCooldown[userEmail] = { blockUntil: Date.now() + BLOCK_DURATION };
-            delete requestCounts[userEmail]; // Reset attempts after blocking
+            delete requestCounts[userEmail];
             return res.status(429).json({ error: `Too many requests. You are blocked for 24 hours.` });
         }
 
+        // Generate and store verification code
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
         verificationCodes[userEmail] = { code: verificationCode, expiry: Date.now() + CODE_EXPIRY_DURATION };
         requestCooldown[userEmail] = requestCooldown[userEmail] || {};
         requestCooldown[userEmail].lastRequest = Date.now();
 
+        // Send verification email
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: userEmail,
@@ -140,9 +156,10 @@ exports.sendVerificationCode = async (req, res) => {
     }
 };
 
+// 4. Verify Code
 exports.verifyCode = async (req, res) => {
     const { code } = req.body;
-    const userEmail = req.userEmail || req.body.email; // Get email from session or request
+    const userEmail = req.userEmail || req.body.email;
 
     if (!userEmail || !verificationCodes[userEmail]) {
         return res.status(400).json({ error: 'No verification code requested for this email or it has expired.' });
@@ -157,16 +174,25 @@ exports.verifyCode = async (req, res) => {
 
     if (code === storedCodeData.code) {
         try {
-            await User.findOneAndUpdate({ email: userEmail }, { isEmailVerified: true });
-            delete verificationCodes[userEmail];
-            delete requestCooldown[userEmail];
-            delete requestCounts[userEmail];
-            res.json({ message: 'Email verified' });
+            const updatedUser = await User.findOneAndUpdate(
+                { email: userEmail, accountStatus: 'pending' },
+                { isEmailVerified: true, accountStatus: 'active' },
+                { new: true } // Return the updated document
+            );
+
+            if (updatedUser && updatedUser.isEmailVerified) {
+                delete verificationCodes[userEmail];
+                delete requestCooldown[userEmail];
+                delete requestCounts[userEmail];
+                return res.json({ message: 'Email verified' });
+            } else {
+                return res.status(500).json({ error: 'Failed to update verification status.' });
+            }
         } catch (error) {
             console.error('Error updating user verification status:', error);
-            res.status(500).json({ error: 'Failed to update verification status.' });
+            return res.status(500).json({ error: 'Failed to update verification status.' });
         }
     } else {
-        res.status(400).json({ error: 'Invalid verification code.' });
+        return res.status(400).json({ error: 'Invalid verification code.' });
     }
 };
