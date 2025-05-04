@@ -1,4 +1,3 @@
-// server/models/userModel.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -18,7 +17,10 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
     },
-    // You can add more fields here, like timestamps, roles, etc.
+    isEmailVerified: {
+        type: Boolean,
+        default: false,
+    },
 }, { timestamps: true }); // Adds createdAt and updatedAt fields automatically
 
 const User = mongoose.model('User', userSchema);
