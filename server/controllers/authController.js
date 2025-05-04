@@ -28,21 +28,26 @@ exports.signup = async (req, res) => {
 };
 
 exports.sendVerificationCode = async (req, res) => {
-  const userEmail = req.body.email;
-  if (!userEmail) return res.status(400).json({ error: 'Email is required.' });
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required.' });
+
+  const cooldownWindow = verificationCodes[email];
+  if (cooldownWindow && Date.now() < cooldownWindow.expiry - 30000) {
+    return res.status(429).json({ error: 'Please wait before requesting another code.', retryAfter: 20 });
+  }
 
   try {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    verificationCodes[userEmail] = { code, expiry: Date.now() + 60000 };
+    verificationCodes[email] = { code, expiry: Date.now() + 60000 };
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: userEmail,
+      to: email,
       subject: 'Email Verification Code',
       html: `<p>Your verification code is: <strong>${code}</strong></p>`
     });
 
-    res.status(200).json({ message: 'Verification code sent.' });
+    res.status(200).json({ message: 'Verification code sent.', expiresIn: 60 });
   } catch (error) {
     res.status(500).json({ error: 'Failed to send verification code.' });
   }
@@ -50,8 +55,9 @@ exports.sendVerificationCode = async (req, res) => {
 
 exports.verifyCode = async (req, res) => {
   const { email, code } = req.body;
-  const stored = verificationCodes[email];
+  if (!email || !code) return res.status(400).json({ error: 'Email and code are required.' });
 
+  const stored = verificationCodes[email];
   if (!stored) return res.status(400).json({ error: 'No code found for this email.' });
   if (Date.now() > stored.expiry) return res.status(400).json({ error: 'Code expired.' });
   if (code !== stored.code) return res.status(400).json({ error: 'Invalid code.' });
@@ -60,7 +66,7 @@ exports.verifyCode = async (req, res) => {
     await User.findOneAndUpdate({ email }, { isEmailVerified: true, accountStatus: 'active' });
     delete verificationCodes[email];
     res.status(200).json({ message: 'Email verified.' });
-  } catch {
+  } catch (err) {
     res.status(500).json({ error: 'Verification update failed.' });
   }
 };
@@ -73,11 +79,12 @@ exports.login = async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password)))
       return res.status(401).json({ error: 'Invalid credentials.' });
 
-    if (!user.isEmailVerified) return res.status(403).json({ error: 'Email not verified.' });
+    if (!user.isEmailVerified)
+      return res.status(403).json({ error: 'Email not verified.' });
 
     const token = generateToken(user._id);
     res.json({ message: 'Login successful', token });
-  } catch {
+  } catch (err) {
     res.status(500).json({ error: 'Login failed.' });
   }
 };
