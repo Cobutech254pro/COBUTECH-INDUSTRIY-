@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Email Verification</title>
-  <link rel="stylesheet" href="/public/css/verification.css">
+  <link rel="stylesheet" href="/public/css/verification.css" />
 </head>
 <body>
   <div class="verification-container">
     <h1>Email Verification</h1>
+
     <div id="request-code-section">
-      <p>Click the button to receive a 6-digit code.</p>
+      <p>Enter your email to receive a 6-digit code:</p>
+      <input type="email" id="email-input" placeholder="Enter your email" required />
       <button id="request-code-button" class="primary-button">Request Code</button>
       <p id="request-code-message"></p>
       <p id="new-code-cooldown-timer" class="hidden"></p>
@@ -19,15 +21,16 @@
     <div id="verify-code-section" class="hidden">
       <p>Enter the 6-digit code:</p>
       <div class="code-input-group">
-        <input maxlength="1" class="code-input" type="text">
-        <input maxlength="1" class="code-input" type="text">
-        <input maxlength="1" class="code-input" type="text">
-        <input maxlength="1" class="code-input" type="text">
-        <input maxlength="1" class="code-input" type="text">
-        <input maxlength="1" class="code-input" type="text">
+        <input maxlength="1" class="code-input" type="text" />
+        <input maxlength="1" class="code-input" type="text" />
+        <input maxlength="1" class="code-input" type="text" />
+        <input maxlength="1" class="code-input" type="text" />
+        <input maxlength="1" class="code-input" type="text" />
+        <input maxlength="1" class="code-input" type="text" />
       </div>
       <button id="verify-code-button" class="primary-button">Verify</button>
       <p id="verify-code-message"></p>
+      <p id="code-expiration-timer" class="hidden"></p>
     </div>
 
     <div id="verification-success" class="hidden">
