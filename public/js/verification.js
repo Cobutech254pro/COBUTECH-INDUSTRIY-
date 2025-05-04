@@ -1,12 +1,8 @@
 console.log('verification.js file has loaded!');
 
-// Your existing JavaScript code below this line
-
-
-
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
 
-// Firebase configuration (replace with your actual config)
+// Firebase configuration (replace with your actual config - although it's not directly used in this file currently)
 const firebaseConfig = {
     apiKey: "AIzaSyCmk6NU1uiCnb6syjOmgTjpq5qBP5QyQAY",
     authDomain: "cobu-tech-portal.firebaseapp.com",
@@ -16,10 +12,11 @@ const firebaseConfig = {
     appId: "1:61919067593:web:5a60042df8622d6edb3c18"
 };
 
-// Initialize Firebase
+// Initialize Firebase (although not directly used in this script)
 const app = initializeApp(firebaseConfig);
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Get references to HTML elements
     const requestCodeSection = document.getElementById('request-code-section');
     const verifyCodeSection = document.getElementById('verify-code-section');
     const requestCodeButton = document.getElementById('request-code-button');
@@ -32,23 +29,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const proceedQuotationButton = document.getElementById('proceed-quotation-button');
     const codeExpirationTimerDisplay = document.getElementById('code-expiration-timer');
     const newCodeCooldownTimerDisplay = document.getElementById('new-code-cooldown-timer');
+    const requestNewCodeButton = document.getElementById('request-new-code-button'); // Added this
 
+    // State variables
     let expirationInterval;
     let canRequestNewCode = true;
     let cooldownTimeRemaining = 0;
     let requestAttempts = 0;
 
-    // Initial state: Show request code section
-    requestCodeSection.classList.remove('hidden');
-    verifyCodeSection.classList.add('hidden');
-    verificationSuccessDiv.classList.add('hidden');
-    verificationErrorDiv.classList.add('hidden');
-    codeExpirationTimerDisplay.classList.add('hidden');
-    newCodeCooldownTimerDisplay.classList.add('hidden');
+    // --- UI State Management ---
+    const showSection = (section) => {
+        const sections = [requestCodeSection, verifyCodeSection, verificationSuccessDiv, verificationErrorDiv];
+        sections.forEach(sec => sec.classList.add('hidden'));
+        section?.classList.remove('hidden');
+    };
 
+    const showTimer = (timerDisplay, show) => {
+        timerDisplay.classList.toggle('hidden', !show);
+    };
+
+    const enableRequestButton = (enable) => {
+        requestCodeButton.disabled = !enable;
+        canRequestNewCode = enable;
+        if (enable) {
+            requestCodeMessage.textContent = '';
+        }
+    };
+
+    // --- Timer Functions ---
     function startExpirationTimer(duration) {
         clearInterval(expirationInterval);
-        codeExpirationTimerDisplay.classList.remove('hidden');
+        showTimer(codeExpirationTimerDisplay, true);
         let timeLeft = duration;
         codeExpirationTimerDisplay.textContent = `Code expires in ${timeLeft} seconds`;
         expirationInterval = setInterval(() => {
@@ -56,19 +67,18 @@ document.addEventListener('DOMContentLoaded', () => {
             codeExpirationTimerDisplay.textContent = `Code expires in ${timeLeft} seconds`;
             if (timeLeft <= 0) {
                 clearInterval(expirationInterval);
-                codeExpirationTimerDisplay.classList.add('hidden');
+                showTimer(codeExpirationTimerDisplay, false);
                 verifyCodeMessage.textContent = 'Verification code expired. Request a new one.';
-                requestCodeSection.classList.remove('hidden'); // Show request button again
-                verifyCodeSection.classList.add('hidden');      // Hide code input
+                showSection(requestCodeSection);
+                showSection(verifyCodeSection, false);
             }
         }, 1000);
     }
 
     function startCooldownTimer(duration) {
-        canRequestNewCode = false;
+        enableRequestButton(false);
         cooldownTimeRemaining = duration;
-        newCodeCooldownTimerDisplay.classList.remove('hidden');
-        requestCodeButton.disabled = true;
+        showTimer(newCodeCooldownTimerDisplay, true);
         newCodeCooldownTimerDisplay.textContent = `Wait ${cooldownTimeRemaining} seconds to request a new code`;
         clearInterval(cooldownInterval);
         const cooldownInterval = setInterval(() => {
@@ -76,13 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
             newCodeCooldownTimerDisplay.textContent = `Wait ${cooldownTimeRemaining} seconds to request a new code`;
             if (cooldownTimeRemaining <= 0) {
                 clearInterval(cooldownInterval);
-                newCodeCooldownTimerDisplay.classList.add('hidden');
-                requestCodeButton.disabled = false;
-                canRequestNewCode = true;
+                showTimer(newCodeCooldownTimerDisplay, false);
+                enableRequestButton(true);
             }
         }, 1000);
     }
 
+    // --- Event Listeners ---
     requestCodeButton.addEventListener('click', async () => {
         if (!canRequestNewCode) return;
 
@@ -94,8 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (response.ok && data.message === 'Verification code sent') {
-                requestCodeSection.classList.add('hidden');
-                verifyCodeSection.classList.remove('hidden');
+                showSection(verifyCodeSection);
                 requestCodeMessage.textContent = '';
                 startExpirationTimer(60);
                 requestAttempts = 0; // Reset attempts on successful request
@@ -103,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 requestCodeMessage.textContent = data.error || 'Failed to request code.';
                 requestAttempts++;
                 if (requestAttempts >= 3) {
-                    requestCodeButton.disabled = true;
+                    enableRequestButton(false);
                     requestCodeMessage.textContent = 'Too many request attempts. You can request again after 24 hours.';
                     startCooldownTimer(24 * 60 * 60); // 24 hours in seconds
                 } else if (data.retryAfter) {
@@ -117,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             requestCodeMessage.textContent = 'Failed to request code.';
             requestAttempts++;
             if (requestAttempts >= 3) {
-                requestCodeButton.disabled = true;
+                enableRequestButton(false);
                 requestCodeMessage.textContent = 'Too many request attempts. You can request again after 24 hours.';
                 startCooldownTimer(24 * 60 * 60); // 24 hours in seconds
             } else {
@@ -143,24 +152,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (response.ok && data.message === 'Email verified') {
                 clearInterval(expirationInterval);
-                verifyCodeSection.classList.add('hidden');
-                verificationSuccessDiv.classList.remove('hidden');
+                showSection(verificationSuccessDiv);
                 verifyCodeMessage.textContent = '';
-                // Redirect to quotation page here
                 setTimeout(() => {
                     window.location.href = '/prompt-quotation';
                 }, 1500); // Short delay for visual feedback
             } else {
                 verifyCodeMessage.textContent = 'Verification failed. Please check the code.';
-                // Optionally turn input boxes to black (you'll need to add CSS for this)
                 codeInputs.forEach(input => {
-                    input.classList.add('incorrect-code'); // Add a CSS class
+                    input.classList.add('incorrect-code'); // Add a CSS class (you need to define this in your CSS)
                     setTimeout(() => {
-                        input.classList.remove('incorrect-code'); // Remove after a short time
-                        input.value = ''; // Clear the input
+                        input.classList.remove('incorrect-code');
+                        input.value = '';
                     }, 1000);
-                }
-                );
+                });
             }
         } catch (error) {
             console.error('Error verifying code:', error);
@@ -174,12 +179,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Focus on the first input box when the verify section is shown
-    const observer = new MutationObserver((mutationsList, observer) => {
+    if (requestNewCodeButton) {
+        requestNewCodeButton.addEventListener('click', () => {
+            showSection(requestCodeSection);
+            showSection(verificationErrorDiv, false);
+            verifyCodeMessage.textContent = '';
+        });
+    }
+
+    // --- Input Focus Handling ---
+    const focusFirstInput = () => {
+        if (!verifyCodeSection.classList.contains('hidden')) {
+            codeInputs[0]?.focus();
+        }
+    };
+
+    const observer = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class' && verifyCodeSection.classList.contains('hidden') === false) {
-                codeInputs[0]?.focus();
-                observer.disconnect();
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class' && !verifyCodeSection.classList.contains('hidden')) {
+                focusFirstInput();
+                observer.disconnect(); // Observe only once when section becomes visible
                 break;
             }
         }
@@ -187,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     observer.observe(verifyCodeSection, { attributes: true });
 
-    // Automatically move focus between input boxes
     codeInputs.forEach((input, index) => {
         input.addEventListener('input', () => {
             if (input.value.length === 1 && index < codeInputs.length - 1) {
@@ -201,4 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Initial state
+    showSection(requestCodeSection);
 });
