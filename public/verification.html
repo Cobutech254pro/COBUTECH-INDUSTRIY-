@@ -11,29 +11,39 @@
 <body>
     <div class="verification-container">
         <h1>Email Verification</h1>
+
         <div id="request-code-section">
-            <p>Please click the button below to receive a verification code in your email address.</p>
+            <p>Click the button below to receive a 6-digit verification code in your email address.</p>
             <button id="request-code-button" class="primary-button">Request Code</button>
             <p id="request-code-message" class="message"></p>
             <p id="new-code-cooldown-timer" class="timer hidden"></p>
         </div>
+
         <div id="verify-code-section" class="hidden">
             <p>Enter the 6-digit verification code sent to your email:</p>
-            <p id="code-expiration-timer" class="timer hidden"></p>
-            <div class="input-group">
-                <input type="text" id="verification-code" placeholder="XXXXXX" maxlength="6" required>
-                <button id="verify-code-button" class="primary-button">Verify Code</button>
+            <p id="code-expiration-timer" class="timer hidden">Code expires in 60 seconds</p>
+            <div class="code-input-group">
+                <input type="text" id="code-input-1" maxlength="1" class="code-input" required>
+                <input type="text" id="code-input-2" maxlength="1" class="code-input" required>
+                <input type="text" id="code-input-3" maxlength="1" class="code-input" required>
+                <input type="text" id="code-input-4" maxlength="1" class="code-input" required>
+                <input type="text" id="code-input-5" maxlength="1" class="code-input" required>
+                <input type="text" id="code-input-6" maxlength="1" class="code-input" required>
             </div>
+            <button id="verify-code-button" class="primary-button">Verify Code</button>
             <p id="verify-code-message" class="message"></p>
         </div>
+
         <div id="verification-success" class="hidden">
             <i class="fas fa-check-circle success-icon"></i>
             <h2>Email Verified Successfully!</h2>
             <p>You can now proceed to get a quotation.</p>
             <button id="proceed-quotation-button" class="primary-button">Get Quotation</button>
         </div>
+
         <div id="verification-error" class="hidden">
             <p id="verification-error-message" class="error-message">Verification failed. Please try again.</p>
+            <button id="request-new-code-button" class="primary-button">Request New Code</button>
         </div>
     </div>
 
