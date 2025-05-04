@@ -2,6 +2,8 @@ body {
   background-color: #000;
   color: #fff;
   font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 .signup-container {
@@ -44,16 +46,17 @@ body {
   box-sizing: border-box;
   font-size: 1em;
   background-color: #222;
-  color: white;
+  color: #fff;
 }
 
-input.error {
+.form-group input.error {
   border-color: red;
 }
 
-.error-text {
+.error-message {
   color: red;
-  font-size: 0.9rem;
+  font-size: 0.9em;
+  margin-top: 5px;
 }
 
 .form-actions {
@@ -77,15 +80,6 @@ input.error {
 .secondary-button {
   background-color: #6c757d;
   color: white;
-}
-
-.terms-group {
-  text-align: left;
-  margin-bottom: 15px;
-}
-
-.terms-group input[type="checkbox"] {
-  margin-right: 5px;
 }
 
 .google-signin-button {
