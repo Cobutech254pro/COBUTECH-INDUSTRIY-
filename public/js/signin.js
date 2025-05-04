@@ -4,7 +4,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithPopup,
-  GoogleAuthProvider
+  GoogleAuthProvider,
+  sendEmailVerification
 } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 
 // Firebase configuration
@@ -49,6 +50,19 @@ document.addEventListener('DOMContentLoaded', () => {
     step1.classList.add('active');
   });
 
+  async function handleSuccessfulSignup(user) {
+    try {
+      await sendEmailVerification(user);
+      console.log('Verification email sent.');
+      alert('Sign up successful! Please check your email to verify your account.');
+      window.location.href = '/public/verification.html'; // Redirect to verification page
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      alert('Sign up successful, but failed to send verification email. Please request it on the verification page.');
+      window.location.href = '/public/verification.html'; // Still redirect
+    }
+  }
+
   signupButton?.addEventListener('click', async () => {
     const password = document.getElementById('signup-password')?.value;
     const confirmPassword = document.getElementById('confirm-password')?.value;
@@ -67,8 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, password);
       console.log('User created:', userCredential.user);
-      alert('Sign up successful!');
-      window.location.href = '/public/verification.html';
+      await handleSuccessfulSignup(userCredential.user); // Send verification email and redirect
     } catch (error) {
       console.error('Sign up error:', error);
       alert(error.message);
@@ -94,8 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = await response.json();
       if (response.ok) {
-        alert('Google sign-in successful!');
-        window.location.href = '/public/verification.html';
+        await handleSuccessfulSignup(user); // Send verification email and redirect
       } else {
         alert(`Google sign-in failed: ${data.error || 'Unknown error'}`);
       }
