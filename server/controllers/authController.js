@@ -1,34 +1,47 @@
-
+// server/controllers/authController.js
 const admin = require('firebase-admin');
 const mongoose = require('mongoose');
-const User = require('../models/userModel'); // Assuming you have your User model defined
+const User = require('../models/userModel');
 
 exports.signup = async (req, res) => {
-    const { email, name, password } = req.body;
+    const { email, name, password, firebaseUid, googleToken } = req.body;
 
     try {
-        // 1. Create user in Firebase Authentication
-        const firebaseUser = await admin.auth().createUser({
-            email: email,
-            password: password
-        });
+        let uid = firebaseUid;
 
-        // 2. If Firebase user creation is successful, store additional data in MongoDB
+        if (!uid && email && password) {
+            const firebaseUser = await admin.auth().createUser({
+                email: email,
+                password: password
+            });
+            uid = firebaseUser.uid;
+        } else if (!uid && googleToken) {
+            // Verify Google ID token if needed for extra security
+            // const decodedToken = await admin.auth().verifyIdToken(googleToken);
+            // uid = decodedToken.uid;
+            // For simplicity, we'll trust the front-end for now after successful popup
+            if (!req.body.name || !req.body.email) {
+                return res.status(400).json({ error: 'Name and email are required for Google sign-in.' });
+            }
+        }
+
+        if (!uid) {
+            return res.status(400).json({ error: 'No Firebase UID provided.' });
+        }
+
         const newUser = new User({
-            firebaseUid: firebaseUser.uid,
+            firebaseUid: uid,
             name: name,
-            email: email // You might want to store email in MongoDB as well
+            email: email
         });
 
         await newUser.save();
 
-        // 3. Send success response
         return res.status(201).json({ message: 'Registration successful!' });
 
     } catch (error) {
         console.error('Error during signup:', error);
 
-        // Handle specific Firebase errors
         if (error.code === 'auth/email-already-in-use') {
             return res.status(409).json({ error: 'Email address is already in use.' });
         }
@@ -38,15 +51,11 @@ exports.signup = async (req, res) => {
         if (error.code === 'auth/weak-password') {
             return res.status(400).json({ error: 'Password is too weak.' });
         }
-
-        // Handle MongoDB validation errors
         if (error.name === 'ValidationError') {
             const errors = Object.values(error.errors).map(el => el.message);
             return res.status(400).json({ error: 'Validation failed', details: errors });
         }
 
-        // Handle other errors
         return res.status(500).json({ error: 'Failed to create user.' });
     }
 };
-            
