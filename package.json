@@ -1,24 +1,24 @@
 {
   "name": "cobutech-industriy",
   "version": "1.0.0",
-  "main": "server/server.js", // Corrected path to your main server file
+  "main": "server/server.js", 
   "scripts": {
     "start": "node server/server.js",
-    "dev": "nodemon server/server.js" // Useful for local development
+    "dev": "nodemon server/server.js" 
   },
   "dependencies": {
-    "bcrypt": "^5.1.0",       // For password hashing
+    "bcrypt": "^5.1.0",       
     "dotenv": "^16.0.0",
     "express": "^4.18.2",
     "firebase-admin": "^11.5.0",
-    "jsonwebtoken": "^9.0.0",  // For creating authentication tokens
+    "jsonwebtoken": "^9.0.0",  
     "mongoose": "^7.0.3",
-    "nodemailer": "^6.9.10"    // For sending emails (verification codes)
+    "nodemailer": "^6.9.10"   
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"       // For development server with auto-reload
+    "nodemon": "^3.0.1"      
   },
   "engines": {
-    "node": ">=18.0.0"         // Specify a compatible Node.js version
+    "node": ">=18.0.0"         
   }
 }
