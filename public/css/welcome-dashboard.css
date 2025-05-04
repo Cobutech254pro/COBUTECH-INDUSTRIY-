@@ -4,10 +4,13 @@ body {
     color: white;
     margin: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column; /* Arrange items vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: flex-start; /* Align items from the top initially */
     min-height: 100vh;
     text-align: center;
+    padding-bottom: 40px; /* Add some padding at the bottom for the fixed copyright */
+    box-sizing: border-box; /* Include padding in element's total width and height */
 }
 
 .container {
@@ -17,17 +20,25 @@ body {
 }
 
 .profile-container {
-    width: 100px; /* Adjust size as needed */
-    height: 100px; /* Adjust size as needed */
+    width: 4cm; /* 2cm radius means 4cm diameter */
+    height: 4cm;
     border-radius: 50%;
     overflow: hidden;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .profile-picture {
     width: 100%;
     height: auto;
     display: block;
+    object-fit: cover; /* Ensure the image covers the circular area */
+}
+
+.welcome-text {
+    margin-bottom: 30px; /* Add space between welcome text and buttons */
 }
 
 .welcome-text h1 {
@@ -63,7 +74,7 @@ body {
 }
 
 .contact-section {
-    margin-bottom: 20px;
+    margin-bottom: 40px; /* Add space before the copyright */
 }
 
 .contact-section p {
@@ -85,6 +96,12 @@ body {
 }
 
 .copyright {
-    margin-top: 20px;
+    position: fixed; /* Stick to the viewport */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
     font-size: 0.8em;
+    background-color: rgba(0, 0, 0, 0.3); /* Optional: Add a subtle background */
 }
