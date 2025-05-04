@@ -11,8 +11,8 @@ const port = process.env.PORT || 5000;
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, '..', 'public'))); // Adjust path as needed
+// Serve static files from the root directory
+app.use(express.static(path.join(__dirname, '..'))); // Serve from one level up (Cobutech-premium-website)
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
@@ -41,9 +41,9 @@ if (serviceAccount) {
 // Use authentication routes
 app.use('/api/auth', authRoutes);
 
-// Handle all other requests by serving the index.html
+// Handle all other requests by serving the index.html from the root
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html')); // Adjust path as needed
+  res.sendFile(path.join(__dirname, '..', 'index.html')); // Serve index.html from one level up
 });
 
 app.listen(port, () => {
