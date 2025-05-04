@@ -1,1 +1,61 @@
 
+# Node.js
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-error.log*
+
+# Environment Variables
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# Firebase Configuration
+firebase-adminsdk*.json
+serviceAccountKey*.json
+
+# MongoDB Configuration
+mongod.conf
+.mongorc.js
+
+# IDE specific files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Build output
+build/
+dist/
+out/
+
+# Logs
+*.log
+debug.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Secret files
+config/secrets.json
+auth.json
+api_keys.txt
+passwords.txt
+*.key
+sensitive-data/
+
+# Add any other project-specific ignore rules below this line
+
