@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - Cobutech Premium VIP Website</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/public/css/verification.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="verification-container">
+        <h1>Email Verification</h1>
+        <div id="request-code-section">
+            <p>Please click the button below to receive a verification code in your email address.</p>
+            <button id="request-code-button" class="primary-button">Request Code</button>
+            <p id="request-code-message" class="message"></p>
+            <p id="new-code-cooldown-timer" class="timer hidden"></p>
+        </div>
+        <div id="verify-code-section" class="hidden">
+            <p>Enter the 6-digit verification code sent to your email:</p>
+            <p id="code-expiration-timer" class="timer hidden"></p>
+            <div class="input-group">
+                <input type="text" id="verification-code" placeholder="XXXXXX" maxlength="6" required>
+                <button id="verify-code-button" class="primary-button">Verify Code</button>
+            </div>
+            <p id="verify-code-message" class="message"></p>
+        </div>
+        <div id="verification-success" class="hidden">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2>Email Verified Successfully!</h2>
+            <p>You can now proceed to get a quotation.</p>
+            <button id="proceed-quotation-button" class="primary-button">Get Quotation</button>
+        </div>
+        <div id="verification-error" class="hidden">
+            <p id="verification-error-message" class="error-message">Verification failed. Please try again.</p>
+        </div>
+    </div>
+
+    <script src="/public/js/verification.js"></script>
+</body>
+</html>
