@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 
-// Firebase configuration (replace with your actual config)
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCmk6NU1uiCnb6syjOmgTjpq5qBP5QyQAY",
     authDomain: "cobu-tech-portal.firebaseapp.com",
@@ -18,41 +18,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const verifyCodeSection = document.getElementById('verify-code-section');
     const requestCodeButton = document.getElementById('request-code-button');
     const verifyCodeButton = document.getElementById('verify-code-button');
-    const verificationCodeInput = document.getElementById('verification-code');
+    const codeInputs = document.querySelectorAll('.code-input');
     const verificationSuccessDiv = document.getElementById('verification-success');
     const verificationErrorDiv = document.getElementById('verification-error');
     const requestCodeMessage = document.getElementById('request-code-message');
     const verifyCodeMessage = document.getElementById('verify-code-message');
     const proceedQuotationButton = document.getElementById('proceed-quotation-button');
-    const codeExpirationTimer = document.getElementById('code-expiration-timer');
-    const newCodeCooldownTimer = document.getElementById('new-code-cooldown-timer');
+    const codeExpirationTimerDisplay = document.getElementById('code-expiration-timer');
+    const newCodeCooldownTimerDisplay = document.getElementById('new-code-cooldown-timer');
+    const requestNewCodeButton = document.getElementById('request-new-code-button');
 
     let expirationInterval;
-    let cooldownInterval;
     let canRequestNewCode = true;
     let cooldownTimeRemaining = 0;
 
-    // Initially show the request code section
+    // Initial state: Show request code section
     requestCodeSection.classList.remove('hidden');
     verifyCodeSection.classList.add('hidden');
     verificationSuccessDiv.classList.add('hidden');
     verificationErrorDiv.classList.add('hidden');
-    codeExpirationTimer.classList.add('hidden');
-    newCodeCooldownTimer.classList.add('hidden');
+    codeExpirationTimerDisplay.classList.add('hidden');
+    newCodeCooldownTimerDisplay.classList.add('hidden');
+    if (requestNewCodeButton) requestNewCodeButton.classList.add('hidden');
 
     function startExpirationTimer(duration) {
         clearInterval(expirationInterval);
-        codeExpirationTimer.classList.remove('hidden');
+        codeExpirationTimerDisplay.classList.remove('hidden');
         let timeLeft = duration;
-        codeExpirationTimer.textContent = `Code expires in ${timeLeft} seconds`;
+        codeExpirationTimerDisplay.textContent = `Code expires in ${timeLeft} seconds`;
         expirationInterval = setInterval(() => {
             timeLeft--;
-            codeExpirationTimer.textContent = `Code expires in ${timeLeft} seconds`;
+            codeExpirationTimerDisplay.textContent = `Code expires in ${timeLeft} seconds`;
             if (timeLeft <= 0) {
                 clearInterval(expirationInterval);
-                codeExpirationTimer.classList.add('hidden');
+                codeExpirationTimerDisplay.classList.add('hidden');
                 verifyCodeMessage.textContent = 'Verification code expired. Request a new one.';
-                startCooldownTimer(120);
+                // Optionally, show the request new code button here
+                if (requestNewCodeButton) requestNewCodeButton.classList.remove('hidden');
             }
         }, 1000);
     }
@@ -60,16 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function startCooldownTimer(duration) {
         canRequestNewCode = false;
         cooldownTimeRemaining = duration;
-        newCodeCooldownTimer.classList.remove('hidden');
+        newCodeCooldownTimerDisplay.classList.remove('hidden');
         requestCodeButton.disabled = true;
-        newCodeCooldownTimer.textContent = `Wait ${cooldownTimeRemaining} seconds to request a new code`;
+        newCodeCooldownTimerDisplay.textContent = `Wait ${cooldownTimeRemaining} seconds to request a new code`;
         clearInterval(cooldownInterval);
-        cooldownInterval = setInterval(() => {
+        const cooldownInterval = setInterval(() => {
             cooldownTimeRemaining--;
-            newCodeCooldownTimer.textContent = `Wait ${cooldownTimeRemaining} seconds to request a new code`;
+            newCodeCooldownTimerDisplay.textContent = `Wait ${cooldownTimeRemaining} seconds to request a new code`;
             if (cooldownTimeRemaining <= 0) {
                 clearInterval(cooldownInterval);
-                newCodeCooldownTimer.classList.add('hidden');
+                newCodeCooldownTimerDisplay.classList.add('hidden');
                 requestCodeButton.disabled = false;
                 canRequestNewCode = true;
             }
@@ -77,40 +79,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     requestCodeButton.addEventListener('click', async () => {
-        if (!canRequestNewCode) {
-            return; // Prevent multiple requests during cooldown
-        }
-        requestCodeMessage.textContent = 'Sending verification code...';
+        if (!canRequestNewCode) return;
+
+        requestCodeMessage.textContent = 'Sending code...';
         try {
             const response = await fetch('/api/auth/send-verification-code', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // You might need to send the user's email or UID here if your backend needs it
-                // body: JSON.stringify({ email: /* user's email */ }),
+                headers: { 'Content-Type': 'application/json' },
             });
             const data = await response.json();
             if (response.ok && data.message === 'Verification code sent') {
                 requestCodeSection.classList.add('hidden');
                 verifyCodeSection.classList.remove('hidden');
                 requestCodeMessage.textContent = '';
-                startExpirationTimer(60); // Start the 60-second timer
+                startExpirationTimer(60);
             } else {
-                requestCodeMessage.textContent = data.error || 'Failed to send verification code.';
-                startCooldownTimer(120); // Start cooldown on failure as well
+                requestCodeMessage.textContent = data.error || 'Failed to send code.';
+                if (data.retryAfter) {
+                    startCooldownTimer(data.retryAfter);
+                } else {
+                    startCooldownTimer(120); // Default cooldown
+                }
             }
         } catch (error) {
-            console.error('Error sending verification code:', error);
-            requestCodeMessage.textContent = 'Failed to send verification code.';
-            startCooldownTimer(120); // Start cooldown on error as well
+            console.error('Error requesting code:', error);
+            requestCodeMessage.textContent = 'Failed to request code.';
+            startCooldownTimer(120);
         }
     });
 
     verifyCodeButton.addEventListener('click', async () => {
-        const code = verificationCodeInput.value.trim();
+        const code = Array.from(codeInputs).map(input => input.value).join('');
         if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
-            verifyCodeMessage.textContent = 'Please enter a valid 6-digit code.';
+            verifyCodeMessage.textContent = 'Please enter the 6-digit code.';
             return;
         }
 
@@ -118,34 +119,65 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/auth/verify-code', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code: code }),
             });
             const data = await response.json();
             if (response.ok && data.message === 'Email verified') {
-                clearInterval(expirationInterval); // Clear the expiration timer
+                clearInterval(expirationInterval);
                 verifyCodeSection.classList.add('hidden');
                 verificationSuccessDiv.classList.remove('hidden');
                 verifyCodeMessage.textContent = '';
-                // Optionally store verification status on the client-side (e.g., localStorage)
             } else {
+                verifyCodeMessage.textContent = data.error || 'Verification failed. Try again.';
                 verificationErrorDiv.classList.remove('hidden');
-                verificationErrorDiv.textContent = data.error || 'Verification failed. Please try again.';
-                verifyCodeMessage.textContent = '';
+                // Optionally, you might want to track failed attempts here on the front-end as well
             }
         } catch (error) {
             console.error('Error verifying code:', error);
+            verifyCodeMessage.textContent = 'Verification failed. Please try again.';
             verificationErrorDiv.classList.remove('hidden');
-            verificationErrorDiv.textContent = 'Verification failed. Please try again.';
-            verifyCodeMessage.textContent = '';
         }
     });
 
     if (proceedQuotationButton) {
         proceedQuotationButton.addEventListener('click', () => {
-            window.location.href = '/prompt-quotation'; // Redirect to the quotation page
+            window.location.href = '/prompt-quotation';
         });
     }
+
+    if (requestNewCodeButton) {
+        requestNewCodeButton.addEventListener('click', () => {
+            verificationErrorDiv.classList.add('hidden');
+            requestCodeSection.classList.remove('hidden');
+        });
+    }
+
+    // Focus on the first input box when the verify section is shown
+    const observer = new MutationObserver((mutationsList, observer) => {
+        for (const mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class' && verifyCodeSection.classList.contains('hidden') === false) {
+                codeInputs[0]?.focus();
+                observer.disconnect(); // Stop observing after focus
+                break;
+            }
+        }
+    });
+
+    observer.observe(verifyCodeSection, { attributes: true });
+
+    // Automatically move focus between input boxes
+    codeInputs.forEach((input, index) => {
+        input.addEventListener('input', () => {
+            if (input.value.length === 1 && index < codeInputs.length - 1) {
+                codeInputs[index + 1].focus();
+            }
+        });
+
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Backspace' && input.value.length === 0 && index > 0) {
+                codeInputs[index - 1].focus();
+            }
+        });
+    });
 });
