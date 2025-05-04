@@ -1,25 +1,12 @@
 {
-  "name": "cobu-tech-portal-backend",
+  "name": "cobutech-industriy",
   "version": "1.0.0",
-  "description": "Backend for Cobutech Premium VIP Portal",
-  "main": "server.js", // Assuming your main server file is named server.js
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js" // Optional: for local development with auto-reload
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "mongoose": "^7.x.x", // Use the latest stable version
-    "firebase-admin": "^12.x.x", // Use the latest stable version
-    "dotenv": "^16.x.x", // Use the latest stable version
-    "bcrypt": "^5.x.x", // Use the latest stable version for password hashing
-    "jsonwebtoken": "^9.x.x" // Use the latest stable version for creating tokens
-    // Add any other dependencies your project uses here, e.g., cors, helmet, etc.
-  },
-  "devDependencies": {
-    "nodemon": "^3.x.x" // Use the latest stable version for development
-  },
-  "engines": {
-    "node": ">=18.0.0" // Specify a Node.js version compatible with your dependencies
+    "mongoose": "^7.0.3"
   }
 }
