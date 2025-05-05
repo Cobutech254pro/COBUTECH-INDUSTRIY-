@@ -7,6 +7,7 @@ const bestTechText = "THE BEST TECH YOU'VE NEVER SEEN...";
 const firstTextDisplayTime = 5000; // 5 seconds for "COBU-TECH INDUSTRY"
 const secondTextDisplayTime = 5000; // 5 seconds for the second text
 const fadeOutDuration = 1000; // 1 second for fade out
+const fadeInDuration = 1000; // 1 second for fade in
 
 function fadeOut(element, callback) {
     element.style.transition = `opacity ${fadeOutDuration / 1000}s ease-in-out`;
@@ -22,7 +23,7 @@ function fadeOut(element, callback) {
 function fadeIn(element) {
     element.style.opacity = 0;
     element.style.display = 'block';
-    element.style.transition = `opacity ${fadeOutDuration / 1000}s ease-in-out`;
+    element.style.transition = `opacity ${fadeInDuration / 1000}s ease-in-out`;
     setTimeout(() => {
         element.style.opacity = 1;
     }, 50); // Small delay to ensure transition works
@@ -38,8 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Display initial content
     if (datetimeTopRightInitial) {
         updateDateTime(datetimeTopRightInitial);
-        setInterval(() => updateDateTime(datetimeTopRightInitial), 1000);
+        // Remove the interval to make the time static
+        // setInterval(() => updateDateTime(datetimeTopRightInitial), 1000);
     }
+
+    // Make the first text fade in
+    fadeIn(cobuTechTypingElement);
 
     // Sequence of events
     setTimeout(() => {
