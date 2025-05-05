@@ -49,6 +49,7 @@ input[type="email"] {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s ease;
+    margin-top: 20px;
 }
 
 .primary-button:hover {
@@ -98,4 +99,8 @@ input[type="email"] {
 
 .login-link a:hover {
     text-decoration: underline;
+}
+
+.input-error {
+    margin-top: 5px;
 }
