@@ -78,18 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email, password, remember: rememberCheckbox.checked }),
             });
 
             const data = await response.json();
 
-            // Remember Me
-            if (rememberCheckbox.checked) {
-                localStorage.setItem('rememberedEmail', email);
-            } else {
-                localStorage.removeItem('rememberedEmail');
-            }
-
+            // Remember Me (handled by backend potentially setting longer session)
             if (response.ok) {
                 console.log('Login successful:', data);
                 localStorage.setItem('authToken', data.token);
@@ -120,6 +114,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     resendVerificationButton.addEventListener('click', async () => {
-        // ... (resend verification email logic - remains the same) ...
+        const email = emailInput.value;
+
+        if (!email) {
+            loginErrorMessage.textContent = 'Please enter your email to resend verification.';
+            loginErrorMessage.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/auth/send-verification-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.message?.includes('sent')) {
+                loginErrorMessage.textContent = 'Verification email resent. Please check your inbox.';
+                loginErrorMessage.classList.remove('hidden');
+                resendVerificationLink.classList.add('hidden');
+            } else {
+                loginErrorMessage.textContent = data.error || 'Failed to resend verification email.';
+                loginErrorMessage.classList.remove('hidden');
+            }
+
+        } catch (error) {
+            console.error('Error resending verification email:', error);
+            loginErrorMessage.textContent = 'Failed to resend verification email due to a network error.';
+            loginErrorMessage.classList.remove('hidden');
+        }
     });
 });
