@@ -89,4 +89,31 @@ password, user.password)))
     res.status(500).json({ error: 'Login failed.' });
   }
 };
+// ... other imports ...
+
+exports.login = async (req, res) => {
+    const { email, password, remember } = req.body; // Expecting 'remember' from the front-end
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ error: 'Invalid credentials.' });
+        }
+
+        if (!user.isEmailVerified) {
+            return res.status(403).json({ error: 'Email not verified. Please check your email to complete verification.' });
+        }
+
+        const expiresIn = remember ? '7d' : '1h'; // Example: 7 days if remember is true, 1 hour otherwise
+        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn });
+
+        res.status(200).json({ message: 'Login successful', token });
+
+    } catch (err) {
+        res.status(500).json({ error: 'Login failed.' });
+    }
+};
+
+// ... (rest of your authController) ...
+
       
