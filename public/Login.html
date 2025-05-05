@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Your Application Name</title>
+    <link rel="stylesheet" href="/public/css/style.css"> <link rel="stylesheet" href="/public/css/login.css">   </head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="primary-button">Log In</button>
+        </form>
+        <div id="login-error-message" class="error-message hidden"></div>
+        <div id="resend-verification-link" class="hidden">
+            <p>Your email is not yet verified.</p>
+            <button id="resend-verification-button" class="secondary-button">Resend Verification Email</button>
+        </div>
+        <p class="signup-link">Don't have an account? <a href="/signup">Sign Up</a></p>
+    </div>
+
+    <script src="/public/js/login.js"></script> </body>
+</html>
