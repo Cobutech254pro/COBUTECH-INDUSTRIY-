@@ -3,6 +3,7 @@ body {
     margin: 0;
     padding: 0;
     color: #fff; /* Default text color to white */
+    font-family: sans-serif; /* Added a default font */
 }
 
 html {
@@ -19,6 +20,17 @@ html {
     position: relative;
 }
 
+.logo-container {
+    width: 150px; /* Adjust size as needed */
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 #datetime-top-right-initial {
     position: absolute;
     top: 10px;
@@ -28,7 +40,7 @@ html {
 }
 
 #welcome-animation {
-    opacity: 0; /* Initially hidden */
+    opacity: 0; /* Initially hidden for fade-in */
     transition: opacity 2s ease-in; /* Fade-in transition */
     text-align: center; /* Center the text within the animation container */
 }
@@ -45,9 +57,15 @@ html {
 #best-tech-text {
     font-size: 1.2em;
     color: #fdd835;
+    white-space: pre-line; /* Preserve line breaks from JavaScript */
 }
 
 @keyframes typing-initial {
     from { width: 0 }
     to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: #fff; }
 }
