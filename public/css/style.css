@@ -1,6 +1,9 @@
 body {
+    background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 400% 400%;
+    animation: rainbow-animation 10s ease infinite;
     font-family: sans-serif;
-    color: #fff; /* Default text color to white */
+    color: #fff;
     margin: 0;
     padding: 0;
     display: flex;
@@ -8,13 +11,10 @@ body {
     align-items: center;
     min-height: 100vh;
     text-align: center;
-    background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
-    background-size: 400% 400%;
-    animation: rainbow-animation 10s ease infinite;
 }
 
 html {
-    background: transparent; /* Make sure the html background doesn't interfere */
+    background: transparent;
 }
 
 #initial-welcome-page {
@@ -43,6 +43,8 @@ html {
     white-space: nowrap;
     overflow: hidden;
     margin-bottom: 10px;
+    display: none; /* Initially Hidden */
+    opacity: 0;  /* For Fade In */
 }
 
 #best-tech-text {
@@ -54,7 +56,15 @@ html {
 }
 
 @keyframes rainbow-animation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
