@@ -31,6 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Redirect after full sequence
   setTimeout(() => {
-    window.location.href = '/public/initialization.html';
+    window.location.href = '/public/initialisation.html';
   }, 6000);
 });
