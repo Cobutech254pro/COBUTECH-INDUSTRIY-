@@ -1,63 +1,46 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
-  background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet);
-  background-size: 1400% 1400%;
-  animation: rainbow 10s ease infinite;
-  color: #fff;
   height: 100vh;
+  background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+  background-size: 400% 400%;
+  animation: rainbow-animation 10s ease infinite;
+  font-family: sans-serif;
+  color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
-}
-
-@keyframes rainbow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-#initial-welcome-page {
   position: relative;
-  width: 100%;
 }
 
 #datetime-top-right-initial {
-  position: absolute;
+  position: fixed;
   top: 10px;
   right: 10px;
   font-size: 0.9em;
   color: #fff;
 }
 
+#initial-welcome-page {
+  text-align: center;
+}
+
 #cobu-tech-typing {
   font-size: 2em;
   opacity: 0;
-  animation: fadeInOut 3s forwards;
-}
-
-@keyframes fadeInOut {
-  0% { opacity: 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; }
+  transition: opacity 1s ease-in-out;
 }
 
 #best-tech-text {
   font-size: 1.2em;
   color: red;
-  white-space: pre;
-  overflow: hidden;
-  border-right: 2px solid;
-  width: 0;
+  white-space: pre-line;
   opacity: 0;
-  animation: typing 3s steps(30, end) forwards;
-  animation-delay: 3s;
+  transition: opacity 1s ease-in-out;
 }
 
-@keyframes typing {
-  from { width: 0; opacity: 1; }
-  to { width: 100%; opacity: 1; }
+@keyframes rainbow-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
