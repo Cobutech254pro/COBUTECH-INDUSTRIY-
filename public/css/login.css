@@ -1,94 +1,74 @@
-.login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 30px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
-    text-align: center;
+/* ... (previous CSS rules) ... */
+
+.password-group {
+    position: relative;
 }
 
-h1 {
-    color: #333;
-    margin-bottom: 20px;
+.password-group input[type="password"],
+.password-group input[type="text"] {
+    padding-right: 40px; /* Make space for the toggle button */
 }
 
-.form-group {
+#toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+#toggle-password i {
+    font-size: 1.2em;
+    color: #777;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
     margin-bottom: 15px;
+}
+
+.remember-me input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.input-error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.loading-spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 2s linear infinite;
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.forgot-password {
+    margin-top: 15px;
+    font-size: 0.9em;
     text-align: left;
 }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-    font-weight: bold;
-}
-
-input[type="email"],
-input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 16px;
-}
-
-.primary-button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-.primary-button:hover {
-    background-color: #0056b3;
-}
-
-.secondary-button {
-    background-color: #6c757d;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-.secondary-button:hover {
-    background-color: #545b62;
-}
-
-.error-message {
-    color: red;
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-.signup-link {
-    margin-top: 20px;
-    color: #777;
-    font-size: 14px;
-}
-
-.signup-link a {
+.forgot-password a {
     color: #007bff;
     text-decoration: none;
 }
 
-.signup-link a:hover {
+.forgot-password a:hover {
     text-decoration: underline;
-}
-
-#resend-verification-link {
-    margin-top: 15px;
-    text-align: center;
 }
