@@ -54,3 +54,16 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 forgotPasswordErrorMessage.textContent = data.error || 'Failed to send password reset email. Please try again.';
                 forgotPasswordErrorMessage.classList.
+                forgotPasswordErrorMessage.classList.remove('hidden');
+            }
+
+        } catch (error) {
+            console.error('Error sending forgot password request:', error);
+            forgotPasswordErrorMessage.textContent = 'Failed to send password reset email due to a network error.';
+            forgotPasswordErrorMessage.classList.remove('hidden');
+        } finally {
+            requestResetButton.disabled = false;
+            loadingSpinner.classList.add('hidden');
+        }
+    });
+});
