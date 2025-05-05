@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password - Your Application Name</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/public/css/forgot-password.css">
+</head>
+<body>
+    <div class="forgot-password-container">
+        <h1>Forgot Your Password?</h1>
+        <p>Enter the email address associated with your account.</p>
+        <form id="forgot-password-form">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required aria-describedby="email-error">
+                <div id="email-error" class="error-message input-error hidden"></div>
+            </div>
+            <button type="submit" class="primary-button" id="request-reset-button">Request Password Reset</button>
+            <div class="loading-spinner hidden" aria-busy="true"></div>
+            <div id="forgot-password-message" class="info-message hidden" role="alert"></div>
+            <div id="forgot-password-error-message" class="error-message hidden" role="alert"></div>
+        </form>
+        <p class="login-link">
+            Remember your password? <a href="/login">Log In</a>
+        </p>
+    </div>
+
+    <script src="/public/js/forgot-password.js"></script>
+</body>
+</html>
