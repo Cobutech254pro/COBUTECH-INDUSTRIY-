@@ -7,10 +7,8 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true, select: false },
     isEmailVerified: { type: Boolean, default: false },
     accountStatus: { type: String, enum: ['pending', 'active', 'suspended'], default: 'pending' },
-    verificationCode: { type: String }, // We can remove this as we're using tokens
-    verificationCodeExpires: { type: Date }, // We can remove this as we're using tokens
-    emailVerificationToken: { type: String },
-    emailVerificationExpires: { type: Date },
+    verificationCode: { type: String },
+    verificationCodeExpires: { type: Date },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date }
 }, { timestamps: true });
