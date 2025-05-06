@@ -1,35 +1,35 @@
+const express = require('express');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const cors = require('cors');
+require('dotenv').config(); // Load environment variables from .env
 
-const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true, select: false },
-    isEmailVerified: { type: Boolean, default: false },
-    accountStatus: { type: String, enum: ['pending', 'active', 'suspended'], default: 'pending' },
-    verificationCode: { type: String },
-    verificationCodeExpires: { type: Date },
-    resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date }
-}, { timestamps: true });
+const authRoutes = require('./routes/authRoutes'); // Import authentication routes
 
-// Password hashing middleware (pre-save hook)
-userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) {
-        return next();
-    }
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (error) {
-        return next(error);
-    }
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json()); // For parsing application/json
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('Could not connect to MongoDB:', err));
+
+// Mount authentication routes
+app.use('/api/auth', authRoutes);
+
+// Define a simple route for testing (optional)
+app.get('/', (req, res) => {
+    res.send('Cobutech Industry Backend is running!');
 });
 
-// Method to compare passwords
-userSchema.methods.comparePassword = async function(candidatePassword) {
-    return bcrypt.compare(candidatePassword, this.password);
-};
+// Server Port - Ensure this is at the end after defining routes and middleware
+const port = process.env.PORT || 3000;
 
-module.exports = mongoose.model('User', userSchema);
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
