@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const { generateToken } = require('../config/utils/tokenUtils'); // Assuming you have this utility
+const { generateToken } = require('../config/tokenUtils'); 
 const crypto = require('crypto');
 const transporter = require('../config/emailConfig'); // Your email transporter
 
