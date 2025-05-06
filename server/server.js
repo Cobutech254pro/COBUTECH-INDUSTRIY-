@@ -1,51 +1,35 @@
-require('dotenv').config();
-const express = require('express');
 const mongoose = require('mongoose');
-const admin = require('firebase-admin');
-const authRoutes = require('./routes/authRoutes'); // Assuming this is the path to your auth routes
-const path = require('path'); // Import the 'path' module
+const bcrypt = require('bcrypt');
 
-const app = express();
-const port = process.env.PORT || 5000;
+const userSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    password: { type: String, required: true, select: false },
+    isEmailVerified: { type: Boolean, default: false },
+    accountStatus: { type: String, enum: ['pending', 'active', 'suspended'], default: 'pending' },
+    verificationCode: { type: String },
+    verificationCodeExpires: { type: Date },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date }
+}, { timestamps: true });
 
-// Middleware to parse JSON request bodies
-app.use(express.json());
-
-// Serve static files from the root directory
-app.use(express.static(path.join(__dirname, '..'))); // Serve from one level up (Cobutech-premium-website)
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('Could not connect to MongoDB:', err));
-
-// Initialize Firebase Admin SDK
-let serviceAccount;
-try {
-  serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIALS);
-} catch (error) {
-  console.error('Error parsing FIREBASE_ADMIN_CREDENTIALS:', error);
-}
-
-if (serviceAccount) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
-} else {
-  console.warn('Firebase Admin SDK not initialized due to missing or invalid credentials.');
-}
-
-// Use authentication routes
-app.use('/api/auth', authRoutes);
-
-// Handle all other requests by serving the index.html from the root
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html')); // Serve index.html from one level up
+// Password hashing middleware (pre-save hook)
+userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        return next(error);
+    }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+// Method to compare passwords
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);
